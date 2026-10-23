@@ -8,14 +8,10 @@ import java.util.Map;
 /**
  * F2: ruta más rápida entre dos ubicaciones de la red vial.
  *
- * Estrategia: Greedy (algoritmo de Dijkstra). En cada paso se finaliza el
- * vértice no visitado con menor distancia conocida; esa elección nunca se
- * reconsidera, lo cual es correcto porque todos los tiempos de viaje son
- * positivos. La extracción del mínimo se hace con un min-heap binario
- * propio con "lazy deletion": en vez de actualizar o borrar una entrada
- * obsoleta dentro del heap, se inserta una nueva con la distancia mejorada
- * y las entradas viejas se descartan al extraerlas, comparando contra la
- * mejor distancia conocida en ese momento.
+ * Estrategia: Greedy (Dijkstra). Siempre se finaliza el vértice no visitado
+ * con menor distancia conocida, lo cual es correcto porque los tiempos son
+ * positivos. El mínimo se extrae de un min-heap propio con lazy deletion:
+ * las entradas obsoletas se descartan al sacarlas.
  */
 public class RutaMasRapida {
 
