@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Grafo dirigido de depósitos, centros comunitarios y las conexiones
  * habilitadas entre ellos. Es solo la estructura de datos: el cálculo de
- * rutas vive en {@link RutaMasRapida}.
+ * rutas vive en RutaMasRapida.java
  */
 public class RedVial {
 
