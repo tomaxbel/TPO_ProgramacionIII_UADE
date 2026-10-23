@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Resultado de calcular la ruta más rápida entre dos ubicaciones.
- * Si no es alcanzable, ubicaciones queda vacío y tiempoTotal es -1.
+ * Si no es alcanzable, ubicaciones queda vacío y tiempoTotal es -1
  */
 public record ResultadoRuta(boolean alcanzable, List<String> ubicaciones, int tiempoTotal, List<String> traza) {
 
