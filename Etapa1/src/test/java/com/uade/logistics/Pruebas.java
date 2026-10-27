@@ -310,4 +310,69 @@ class Pruebas {
             assertEquals(ruta.ubicaciones().size(), Set.copyOf(ruta.ubicaciones()).size());
         }
     }
+
+    // ---------------- B4: PlanificacionEntregas ----------------
+
+    @Test
+    void planificacionEntregas_casoDeEjemploResueltoAMano() {
+        Pedido[] pedidos = {
+                new Pedido(1, "Centro Norte", 20261130, 3, 40),
+                new Pedido(2, "Centro Sur", 20261125, 5, 30),
+                new Pedido(3, "Centro Este", 20261125, 5, 20),
+        };
+        Vehiculo[] vehiculos = {
+                new Vehiculo(1, 60, 100),
+                new Vehiculo(2, 50, 80),
+        };
+        int[][] costoAtencion = {
+                {20, 15},
+                {18, -1},
+                {10, 12},
+        };
+
+        // A mano: única combinación que respeta capacidad es P1->V2, P2->V1, P3->V1.
+        // Costo = fijoV1(100) + fijoV2(80) + costo(P1,V2)=15 + costo(P2,V1)=18 + costo(P3,V1)=10 = 223.
+        ResultadoPlanificacion resultado = new PlanificacionEntregas(pedidos, vehiculos, costoAtencion).planificar();
+
+        assertTrue(resultado.factible());
+        assertEquals(223, resultado.costoTotal());
+    }
+
+    @Test
+    void planificacionEntregas_sinSolucionSiTodasLasAsignacionesEstanProhibidas() {
+        Pedido[] pedidos = {new Pedido(1, "Centro Norte", 20261130, 3, 10)};
+        Vehiculo[] vehiculos = {new Vehiculo(1, 100, 50)};
+        int[][] costoAtencion = {{-1}};
+
+        ResultadoPlanificacion resultado = new PlanificacionEntregas(pedidos, vehiculos, costoAtencion).planificar();
+
+        assertFalse(resultado.factible());
+        assertFalse(resultado.criteriosDescarte().isEmpty());
+    }
+
+    @Test
+    void planificacionEntregas_sinSolucionSiNingunVehiculoTieneCapacidad() {
+        Pedido[] pedidos = {new Pedido(1, "Centro Norte", 20261130, 3, 1000)};
+        Vehiculo[] vehiculos = {new Vehiculo(1, 50, 20), new Vehiculo(2, 30, 10)};
+        int[][] costoAtencion = {{5, 5}};
+
+        ResultadoPlanificacion resultado = new PlanificacionEntregas(pedidos, vehiculos, costoAtencion).planificar();
+
+        assertFalse(resultado.factible());
+    }
+
+    @Test
+    void planificacionEntregas_costoFijoSeContabilizaUnaSolaVezPorVehiculo() {
+        Pedido[] pedidos = {
+                new Pedido(1, "Centro Norte", 20261130, 3, 10),
+                new Pedido(2, "Centro Sur", 20261125, 5, 10),
+        };
+        Vehiculo[] vehiculos = {new Vehiculo(1, 100, 50)};
+        int[][] costoAtencion = {{5}, {7}};
+
+        ResultadoPlanificacion resultado = new PlanificacionEntregas(pedidos, vehiculos, costoAtencion).planificar();
+
+        assertTrue(resultado.factible());
+        assertEquals(62, resultado.costoTotal()); // 50 (fijo, una sola vez) + 5 + 7
+    }
 }

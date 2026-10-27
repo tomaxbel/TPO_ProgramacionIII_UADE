@@ -11,6 +11,7 @@ public class Main {
         demoF3();
         demoA1();
         demoB3();
+        demoB4();
     }
 
     private static void demoF1() {
@@ -149,5 +150,39 @@ public class Main {
         }
         System.out.println("  Mejor: " + resultado.mejor());
         System.out.println();
+    }
+
+    private static void demoB4() {
+        System.out.println("=== B4: Planificación de entregas con menor costo ===");
+
+        Pedido[] pedidos = {
+                new Pedido(1, "Centro Norte", 20261130, 3, 40),
+                new Pedido(2, "Centro Sur", 20261125, 5, 30),
+                new Pedido(3, "Centro Este", 20261125, 5, 20),
+        };
+        Vehiculo[] vehiculos = {
+                new Vehiculo(1, 60, 100),
+                new Vehiculo(2, 50, 80),
+        };
+        // costoAtencion[pedido][vehiculo], -1 = prohibido
+        int[][] costoAtencion = {
+                {20, 15},
+                {18, -1},
+                {10, 12},
+        };
+
+        PlanificacionEntregas planificador = new PlanificacionEntregas(pedidos, vehiculos, costoAtencion);
+        ResultadoPlanificacion resultado = planificador.planificar();
+
+        if (!resultado.factible()) {
+            System.out.println("  No existe una distribución válida.");
+        } else {
+            System.out.println("  Asignaciones: " + resultado.asignaciones());
+            System.out.println("  Costo total: " + resultado.costoTotal());
+        }
+        System.out.println("  Criterios de descarte aplicados: " + resultado.criteriosDescarte().size());
+        for (String criterio : resultado.criteriosDescarte()) {
+            System.out.println("    " + criterio);
+        }
     }
 }
