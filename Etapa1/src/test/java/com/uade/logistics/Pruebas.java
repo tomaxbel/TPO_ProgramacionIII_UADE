@@ -205,4 +205,59 @@ class Pruebas {
 
         assertTrue(resultado.pesoTotal() <= capacidad);
     }
+
+    // ---------------- A1: ConsultasRutas ----------------
+
+    private static RedVial redDeEjemplo() {
+        RedVial red = new RedVial();
+        red.agregarArista("Deposito", "CentroA", 10);
+        red.agregarArista("Deposito", "CentroB", 15);
+        red.agregarArista("CentroA", "CentroB", 3);
+        red.agregarArista("CentroA", "CentroC", 20);
+        red.agregarArista("CentroB", "CentroC", 5);
+        red.agregarArista("CentroC", "CentroD", 2);
+        return red;
+    }
+
+    @Test
+    void consultasRutas_coincideConCaminoMinimoCalculadoAMano() {
+        ConsultasRutas consultas = new ConsultasRutas(redDeEjemplo());
+
+        // A mano: Deposito->A->B->C->D = 10+3+5+2 = 20
+        ResultadoRuta resultado = consultas.consultar("Deposito", "CentroD");
+
+        assertTrue(resultado.alcanzable());
+        assertEquals(20, resultado.tiempoTotal());
+        assertEquals(List.of("Deposito", "CentroA", "CentroB", "CentroC", "CentroD"), resultado.ubicaciones());
+    }
+
+    @Test
+    void consultasRutas_tomaElCaminoIndirectoMasCortoEntreDosCentros() {
+        ConsultasRutas consultas = new ConsultasRutas(redDeEjemplo());
+
+        // A mano: CentroA->CentroC directo = 20, pero CentroA->CentroB->CentroC = 3+5 = 8, que es mejor.
+        ResultadoRuta resultado = consultas.consultar("CentroA", "CentroC");
+
+        assertTrue(resultado.alcanzable());
+        assertEquals(8, resultado.tiempoTotal());
+    }
+
+    @Test
+    void consultasRutas_sinConexionInformaNoAlcanzable() {
+        ConsultasRutas consultas = new ConsultasRutas(redDeEjemplo());
+
+        ResultadoRuta resultado = consultas.consultar("CentroB", "Deposito");
+
+        assertFalse(resultado.alcanzable());
+    }
+
+    @Test
+    void consultasRutas_origenIgualDestinoEsCero() {
+        ConsultasRutas consultas = new ConsultasRutas(redDeEjemplo());
+
+        ResultadoRuta resultado = consultas.consultar("CentroA", "CentroA");
+
+        assertTrue(resultado.alcanzable());
+        assertEquals(0, resultado.tiempoTotal());
+    }
 }
