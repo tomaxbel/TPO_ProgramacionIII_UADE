@@ -7,6 +7,7 @@ public class Main {
         demoF1();
         demoF2();
         demoF3();
+        demoA1();
     }
 
     private static void demoF1() {
@@ -101,5 +102,26 @@ public class Main {
         System.out.println("  Peso total: " + resultado.pesoTotal());
         System.out.println("  Prioridad total: " + resultado.prioridadTotal());
         System.out.println("  Capacidad restante: " + resultado.capacidadRestante());
+        System.out.println();
+    }
+
+    private static void demoA1() {
+        System.out.println("Consultas de rutas entre todos los centros (Floyd-Warshall): ");
+
+        RedVial red = new RedVial();
+        red.agregarArista("Deposito", "CentroA", 10);
+        red.agregarArista("Deposito", "CentroB", 15);
+        red.agregarArista("CentroA", "CentroB", 3);
+        red.agregarArista("CentroA", "CentroC", 20);
+        red.agregarArista("CentroB", "CentroC", 5);
+        red.agregarArista("CentroC", "CentroD", 2);
+
+        ConsultasRutas consultas = new ConsultasRutas(red);
+
+        System.out.println("--Deposito -> CentroD--");
+        imprimirRuta(consultas.consultar("Deposito", "CentroD"));
+
+        System.out.println("--CentroB -> Deposito (sin conexion, aristas dirigidas)--");
+        imprimirRuta(consultas.consultar("CentroB", "Deposito"));
     }
 }
