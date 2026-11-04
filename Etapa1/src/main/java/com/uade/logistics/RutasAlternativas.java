@@ -7,21 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * B3: rutas alternativas con restricciones.
- *
- * Estrategia: Backtracking (enumeración con poda). A diferencia de F2 (que busca
- * UNA ruta óptima), acá la consigna pide TODOS los recorridos válidos, así que
- * un algoritmo greedy tipo Dijkstra no sirve: hay que explorar el espacio de
- * caminos. Se arma el camino vértice a vértice con DFS, y se poda apenas una
- * rama deja de ser viable:
- *   - el tiempo acumulado ya superó el tiempo máximo,
- *   - la próxima ubicación está prohibida,
- *   - la próxima ubicación ya fue visitada en este camino (no se repiten
- *     ubicaciones).
- * Al llegar al destino se registra el camino encontrado y se retrocede
- * (backtrack) para seguir probando otras ramas.
- */
 public class RutasAlternativas {
 
     private final RedVial red;
@@ -65,14 +50,14 @@ public class RutasAlternativas {
             String siguiente = arista.getDestino();
 
             if (prohibidas.contains(siguiente)) {
-                continue; // poda: ubicación prohibida
+                continue; //poda: ubi prohibida
             }
             if (visitados.contains(siguiente)) {
-                continue; // poda: no se repiten ubicaciones
+                continue; //poda: no se repiten ubis
             }
             int nuevoTiempo = tiempoAcumulado + arista.getTiempo();
             if (nuevoTiempo > tiempoMaximo) {
-                continue; // poda: se excede el tiempo máximo
+                continue; //poda: se excede el tiempo max
             }
 
             visitados.add(siguiente);
