@@ -3,6 +3,7 @@ package com.uade.logistics;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Casos de prueba de las tres funcionalidades obligatorias de la Etapa 1. */
+/** Casos de prueba de las funcionalidades de la Etapa 1 (F1-F3) y Etapa 2 (A1, B3, B4). */
 class Pruebas {
 
     // ---------------- F1: OrganizadorPedidos ----------------
@@ -246,6 +247,7 @@ class Pruebas {
     void consultasRutas_sinConexionInformaNoAlcanzable() {
         ConsultasRutas consultas = new ConsultasRutas(redDeEjemplo());
 
+        // Las aristas son dirigidas: no hay forma de volver de CentroB a Deposito.
         ResultadoRuta resultado = consultas.consultar("CentroB", "Deposito");
 
         assertFalse(resultado.alcanzable());
@@ -259,5 +261,53 @@ class Pruebas {
 
         assertTrue(resultado.alcanzable());
         assertEquals(0, resultado.tiempoTotal());
+    }
+
+    // ---------------- B3: RutasAlternativas ----------------
+
+    @Test
+    void rutasAlternativas_encuentraTodasLasRutasValidasYLaMejor() {
+        RutasAlternativas buscador = new RutasAlternativas(redDeEjemplo());
+
+        // A mano, de Deposito a CentroD: A->B->C->D=20, B->C->D=22, A->C->D=32.
+        ResultadoRutasAlternativas resultado = buscador.buscar("Deposito", "CentroD", 100, Set.of());
+
+        assertEquals(3, resultado.rutas().size());
+        assertEquals(20, resultado.mejor().tiempoTotal());
+    }
+
+    @Test
+    void rutasAlternativas_respetaElTiempoMaximo() {
+        RutasAlternativas buscador = new RutasAlternativas(redDeEjemplo());
+
+        // Con tiempo máximo 21 solo entra la ruta de 20 (A->B->C->D); las de 22 y 32 se podan.
+        ResultadoRutasAlternativas resultado = buscador.buscar("Deposito", "CentroD", 21, Set.of());
+
+        assertEquals(1, resultado.rutas().size());
+        assertEquals(20, resultado.rutas().get(0).tiempoTotal());
+    }
+
+    @Test
+    void rutasAlternativas_respetaUbicacionesProhibidas() {
+        RutasAlternativas buscador = new RutasAlternativas(redDeEjemplo());
+
+        // Prohibiendo CentroB solo queda Deposito->A->C->D = 32.
+        ResultadoRutasAlternativas resultado = buscador.buscar("Deposito", "CentroD", 100, Set.of("CentroB"));
+
+        assertEquals(1, resultado.rutas().size());
+        assertEquals(32, resultado.rutas().get(0).tiempoTotal());
+    }
+
+    @Test
+    void rutasAlternativas_noRepiteUbicacionesAunConCiclos() {
+        RedVial red = redDeEjemplo();
+        red.agregarArista("CentroD", "CentroA", 1); // crea un ciclo CentroA..CentroD..CentroA
+
+        RutasAlternativas buscador = new RutasAlternativas(red);
+        ResultadoRutasAlternativas resultado = buscador.buscar("Deposito", "CentroD", 1000, Set.of());
+
+        for (RutaEncontrada ruta : resultado.rutas()) {
+            assertEquals(ruta.ubicaciones().size(), Set.copyOf(ruta.ubicaciones()).size());
+        }
     }
 }
